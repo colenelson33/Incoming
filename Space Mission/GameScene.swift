@@ -8,7 +8,7 @@
 import SpriteKit
 import GameplayKit
 
-var currentPlay = playerList[currentIndex]
+var currentPlay = playerList[globalVar.currentIndex]
 //sets up current player object using the current index from player select scene
 var player = SKSpriteNode(imageNamed: currentPlay.playerSprite)
 //sets up current image by retrieving the String from Character object

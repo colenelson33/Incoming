@@ -8,8 +8,11 @@
 import Foundation
 import SpriteKit
 
-var characterSelected = "ca"
-var currentIndex = 0
+struct globalVar{
+    var characterSelected = "ca"
+    static var currentIndex = 0
+}
+
 
 class Character{
     
@@ -93,7 +96,7 @@ class PlayerSelectScene: SKScene{
     
     func saveCharacter(){
         
-        let nextPlayer = SKSpriteNode(imageNamed: playerList[currentIndex].playerSprite)
+        let nextPlayer = SKSpriteNode(imageNamed: playerList[globalVar.currentIndex].playerSprite)
         nextPlayer.name = "playerImage"
         nextPlayer.setScale(0.6)
         nextPlayer.position = CGPoint(x: self.size.width/2, y: self.size.height * 0.6)
@@ -117,10 +120,10 @@ class PlayerSelectScene: SKScene{
             if leftArrow.contains(pointOfTouch){
                 
                 leftArrow.run(clickSound)
-                if currentIndex == 0{
-                currentIndex = 2
+                if globalVar.currentIndex == 0{
+                    globalVar.currentIndex = 2
                 }else{
-                    currentIndex -= 1
+                    globalVar.currentIndex -= 1
                 }
                 self.enumerateChildNodes(withName: "playerImage") {
                     image, stop in
@@ -130,10 +133,10 @@ class PlayerSelectScene: SKScene{
             }
             if rightArrow.contains(pointOfTouch){
                 rightArrow.run(clickSound)
-                if currentIndex == 2{
-                currentIndex = 0
+                if globalVar.currentIndex == 2{
+                    globalVar.currentIndex = 0
                 }else{
-                    currentIndex += 1
+                    globalVar.currentIndex += 1
                 }
                 self.enumerateChildNodes(withName: "playerImage") {
                     image, stop in
