@@ -16,7 +16,7 @@ class MainMenuScene: SKScene{
         background.position = CGPoint(x: self.size.width/2, y: self.size.height/2)
         self.addChild(background)
         
-        let gameBy = SKLabelNode(fontNamed: "Centauri")
+        let gameBy = SKLabelNode(fontNamed: "SFDistantGalaxy")
         gameBy.fontSize = 50
         gameBy.fontColor = SKColor.white
         gameBy.text = "Cole Nelson's"
@@ -24,7 +24,7 @@ class MainMenuScene: SKScene{
         gameBy.position = CGPoint(x: self.size.width/2, y: self.size.height * 0.70)
         self.addChild(gameBy)
         
-        let title1 = SKLabelNode(fontNamed: "Centauri")
+        let title1 = SKLabelNode(fontNamed: "SFDistantGalaxy")
         title1.fontSize = 150
         title1.fontColor = SKColor.white
         title1.text = "Incoming"
