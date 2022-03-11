@@ -64,12 +64,20 @@ class GameOverScene: SKScene{
         highScoreLabel.position = CGPoint(x: self.size.width/2, y: self.size.height * 0.45)
         self.addChild(highScoreLabel)
         
+        let accuracyLabel = SKLabelNode(fontNamed: "SFDistantGalaxy")
+        accuracyLabel.fontSize = 30
+        accuracyLabel.text = "Poor accuracy, hit your shots!"
+        accuracyLabel.zPosition = 1
+        accuracyLabel.fontColor = SKColor.white
+        accuracyLabel.position = CGPoint(x: self.size.width/2, y: self.size.height * 0.1)
+        self.addChild(accuracyLabel)
+        
         
         restartLabel.fontSize = 100
         restartLabel.text = "Play Again"
         restartLabel.zPosition = 1
         restartLabel.fontColor = SKColor.white
-        restartLabel.position = CGPoint(x: self.size.width/2, y: self.size.height * 0.25)
+        restartLabel.position = CGPoint(x: self.size.width/2, y: self.size.height * 0.3)
         self.addChild(restartLabel)
         
     }

@@ -54,6 +54,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func runGameOver(){
         currentGameState = gameState.afterGame
+        GlobalVar.totalMiss = 0
+        GlobalVar.totalShots = 0
         self.removeAllActions()
         self.enumerateChildNodes(withName: "Bullet") {
             obj, stop in
@@ -128,6 +130,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if body2.node != nil{
             spawnExplosion(spawnPosition: body2.node!.position)
             }
+            GlobalVar.totalMiss += 1
             addScore()
             body1.node?.removeFromParent()
             body2.node?.removeFromParent()
@@ -137,6 +140,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if body2.node != nil{
                 spawnExplosion(spawnPosition: body2.node!.position)
                 }
+                GlobalVar.totalMiss += 1
                 body1.node?.removeFromParent()
                 body2.node?.removeFromParent()
             
@@ -229,6 +233,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let levelLabel = SKLabelNode(fontNamed: "SFDistantGalaxy")
     
     override func didMove(to view: SKView) {
+        
+        GlobalVar.totalMiss = 0
+        GlobalVar.totalShots = 0
         
         gameScore = 0
         self.physicsWorld.contactDelegate = self
@@ -327,7 +334,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func fireObj(){
         
+        
+        
         if currentAbilityState == abilityState.normal{
+        GlobalVar.totalShots += 1
         let obj = SKSpriteNode(imageNamed: GlobalVar.weapon)
         obj.name = "Bullet"
         obj.setScale(0.5)
@@ -345,7 +355,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let objSequence = SKAction.sequence([capSound, moveObj, deleteObj])
         obj.run(objSequence)
         } else if currentAbilityState == abilityState.x2{
-            
+            GlobalVar.totalShots += 2
             let obj1 = SKSpriteNode(imageNamed: GlobalVar.weapon)
             obj1.name = "Bullet"
             obj1.setScale(0.4)
@@ -500,10 +510,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if levelNumber == 2 || levelNumber == 5 || levelNumber == 7{
             self.run(spawnNuke)
         }
-        if levelNumber == 3 || levelNumber == 6 {
+        if levelNumber == 4 || levelNumber == 7 {
             self.run(spawnX2)
         }
-        if levelNumber == 4 {
+        if levelNumber == 4 || levelNumber == 7{
             currentAbilityState = abilityState.normal
         }
         if self.action(forKey: "spawningMeteor") != nil{
@@ -519,10 +529,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         case 5: levelDuration = 0.01
         case 6: levelDuration = 0.6
         case 7: levelDuration = 0.01
-        case 8: levelDuration = 0.2
+        case 8: levelDuration = 0.3
             
         default:
-            levelDuration = 0.5
+            levelDuration = 0.1
             print("Cannot find level info")
             
         }

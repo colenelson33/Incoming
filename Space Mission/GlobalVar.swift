@@ -12,4 +12,6 @@ struct GlobalVar{
     public static var currentIndex = 0
     public static var player = SKSpriteNode(imageNamed: playerList[GlobalVar.currentIndex].playerSprite)
     public static var weapon = "greenShield"
+    public static var totalShots = 0.0
+    public static var totalMiss = 0.0
 }
