@@ -8,9 +8,10 @@
 import SpriteKit
 import GameplayKit
 
-var currentPlay = playerList[globalVar.currentIndex]
+
 //sets up current player object using the current index from player select scene
-var player = SKSpriteNode(imageNamed: currentPlay.playerSprite)
+//var player = SKSpriteNode(imageNamed: playerList[GlobalVar.currentIndex].playerSprite)
+
 //sets up current image by retrieving the String from Character object
 
 var gameScore = 0
@@ -25,13 +26,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         case inGame
         case afterGame //case after game
     }
+    
+    enum abilityState{
+        case normal
+        case x2
+    }
+    
+    
     let tapToStartLabel = SKLabelNode(fontNamed: "SFDistantGalaxy")
     
-    
+    var currentAbilityState = abilityState.normal
     var currentGameState = gameState.preGame
     
     func startGame(){
         currentGameState = gameState.inGame
+        currentAbilityState = abilityState.normal
         let fadeOutAction = SKAction.fadeOut(withDuration: 0.5)
         let deleteAction = SKAction.removeFromParent()
         let removeLabelSequence = SKAction.sequence([fadeOutAction, deleteAction])
@@ -40,7 +49,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let movePlayerOnScreen = SKAction.moveTo(y: self.size.height*0.2, duration: 0.5)
         let startLevelAction = SKAction.run(startNewLevel)
         let startGameSequence = SKAction.sequence([movePlayerOnScreen, startLevelAction])
-        player.run(startGameSequence)
+        GlobalVar.player.run(startGameSequence)
     }
     
     func runGameOver(){
@@ -53,6 +62,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.enumerateChildNodes(withName: "Meteor") {
             meteor, stop in
             meteor.removeAllActions()
+        }
+        self.enumerateChildNodes(withName: "Player"){
+            player, stop in
+            player.removeFromParent()
         }
         let changeSceneAction = SKAction.run(changeScene)
         let waitAction = SKAction.wait(forDuration: 1)
@@ -77,6 +90,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         static let Player: UInt32 = 0b1 //binary for 1
         static let Obj: UInt32 = 0b10 //binary for 2
         static let Meteor : UInt32 = 0b100 //binary for 4
+        static let Nuke: UInt32 = 0b1000 //8
+        static let x2: UInt32 = 0b10000 //
     }
     func didBegin(_ contact: SKPhysicsContact) {
         
@@ -106,9 +121,38 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             runGameOver()
         }
         if body1.categoryBitMask == PhysicsCategories.Obj && body2.categoryBitMask == PhysicsCategories.Meteor
-            //&& body2.node?.position.y < self.size.height
+            //&& body2.node!.position.y < self.size.height
         {
+           
             //if bullet hits enemy
+            if body2.node != nil{
+            spawnExplosion(spawnPosition: body2.node!.position)
+            }
+            addScore()
+            body1.node?.removeFromParent()
+            body2.node?.removeFromParent()
+        }
+        if body1.categoryBitMask == PhysicsCategories.Obj && body2.categoryBitMask == PhysicsCategories.Nuke{
+           
+            if body2.node != nil{
+                spawnExplosion(spawnPosition: body2.node!.position)
+                }
+                body1.node?.removeFromParent()
+                body2.node?.removeFromParent()
+            
+           self.enumerateChildNodes(withName: "Meteor") {
+                meteor, stop in
+                self.spawnExplosion(spawnPosition: meteor.position)
+                meteor.removeFromParent()
+               
+            }
+            
+            
+            startNewLevel()
+        }
+        if body1.categoryBitMask == PhysicsCategories.Obj && body2.categoryBitMask == PhysicsCategories.x2{
+            currentAbilityState = abilityState.x2
+          
             if body2.node != nil{
             spawnExplosion(spawnPosition: body2.node!.position)
             }
@@ -118,6 +162,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         
     }
+    
     
     func spawnExplosion(spawnPosition: CGPoint){
         let explosion = SKSpriteNode(imageNamed: "explosion")
@@ -155,7 +200,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func random() -> CGFloat{
         return CGFloat(Float(arc4random())/0xFFFFFFFF)
     }
-    func random(min min: CGFloat, max: CGFloat)->CGFloat{
+    func random(min: CGFloat, max: CGFloat)->CGFloat{
         return random() * (max - min) + min
     }
     /*override func update(_ currentTime: TimeInterval){
@@ -181,8 +226,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var lastUpdateTime : TimeInterval = 0
     var deltaTime : TimeInterval = 0
     var amtToMovePerSec: CGFloat = 600.0
+    let levelLabel = SKLabelNode(fontNamed: "SFDistantGalaxy")
     
     override func didMove(to view: SKView) {
+        
         gameScore = 0
         self.physicsWorld.contactDelegate = self
         
@@ -198,17 +245,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
         
         
+       // let player = GlobalVar.player
+        GlobalVar.player.setScale(0.4)
+        GlobalVar.player.position = CGPoint(x: self.size.width/2, y: 0-GlobalVar.player.size.height)
         
-        player.setScale(0.2)
-        player.position = CGPoint(x: self.size.width/2, y: 0-player.size.height)
+        GlobalVar.player.zPosition = 2
+        GlobalVar.player.name = "Player"
+        GlobalVar.player.physicsBody = SKPhysicsBody(rectangleOf: GlobalVar.player.size)
+        GlobalVar.player.physicsBody!.affectedByGravity = false
+        GlobalVar.player.physicsBody!.categoryBitMask = PhysicsCategories.Player
+        GlobalVar.player.physicsBody!.collisionBitMask = PhysicsCategories.None
+        GlobalVar.player.physicsBody!.contactTestBitMask = PhysicsCategories.Meteor
+        self.addChild(GlobalVar.player)
         
-        player.zPosition = 2
-        player.physicsBody = SKPhysicsBody(rectangleOf: player.size)
-        player.physicsBody!.affectedByGravity = false
-        player.physicsBody!.categoryBitMask = PhysicsCategories.Player
-        player.physicsBody!.collisionBitMask = PhysicsCategories.None
-        player.physicsBody!.contactTestBitMask = PhysicsCategories.Meteor
-        self.addChild(player)
+        
         
         scoreLabel.text = "Score: 0"
         scoreLabel.fontSize = 50
@@ -225,6 +275,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         livesLabel.position = CGPoint(x: self.size.width * 0.78,y: self.size.height + livesLabel.frame.size.height)
         livesLabel.zPosition = 100
         self.addChild(livesLabel)
+        
+        levelLabel.text = "Level 1"
+        levelLabel.fontSize = 150
+        levelLabel.fontColor = SKColor.white
+        levelLabel.alpha = 0.6
+        levelLabel.position = CGPoint(x: self.size.width * 0.5,y: self.size.height * 0.7)
+        levelLabel.zPosition = 100
+        self.addChild(levelLabel)
         
         let moveToScreen = SKAction.moveTo(y: self.size.height*0.9, duration: 0.7)
         livesLabel.run(moveToScreen)
@@ -262,16 +320,18 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func addScore(){
         gameScore+=1
         scoreLabel.text = "Score: \(gameScore)"
-        if gameScore == 8 || gameScore == 16 || gameScore == 24 || gameScore == 30{
+        if gameScore == 8 || gameScore == 16 || gameScore == 24 || gameScore == 32 || gameScore == 40 || gameScore == 48 || gameScore == 56 {
             startNewLevel()
         }
     }
     
     func fireObj(){
-        let obj = SKSpriteNode(imageNamed: "shield")
+        
+        if currentAbilityState == abilityState.normal{
+        let obj = SKSpriteNode(imageNamed: GlobalVar.weapon)
         obj.name = "Bullet"
         obj.setScale(0.5)
-        obj.position = player.position
+        obj.position = GlobalVar.player.position
         obj.zPosition = 1
         obj.physicsBody = SKPhysicsBody(rectangleOf: obj.size)
         obj.physicsBody!.affectedByGravity = false
@@ -284,6 +344,43 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let deleteObj = SKAction.removeFromParent()
         let objSequence = SKAction.sequence([capSound, moveObj, deleteObj])
         obj.run(objSequence)
+        } else if currentAbilityState == abilityState.x2{
+            
+            let obj1 = SKSpriteNode(imageNamed: GlobalVar.weapon)
+            obj1.name = "Bullet"
+            obj1.setScale(0.4)
+            obj1.position = CGPoint(x: GlobalVar.player.position.x - GlobalVar.player.size.width * 0.25, y: GlobalVar.player.position.y)
+            obj1.zPosition = 1
+            obj1.physicsBody = SKPhysicsBody(rectangleOf: obj1.size)
+            obj1.physicsBody!.affectedByGravity = false
+            obj1.physicsBody!.categoryBitMask = PhysicsCategories.Obj
+            obj1.physicsBody!.collisionBitMask = PhysicsCategories.None
+            obj1.physicsBody!.contactTestBitMask = PhysicsCategories.Meteor
+            self.addChild(obj1)
+            
+            let moveObj = SKAction.moveTo(y: obj1.size.height + self.size.height, duration: 1)
+            let deleteObj = SKAction.removeFromParent()
+            let objSequence = SKAction.sequence([capSound, moveObj, deleteObj])
+           
+            let obj2 = SKSpriteNode(imageNamed: GlobalVar.weapon)
+            obj2.name = "Bullet"
+            obj2.setScale(0.4)
+            obj2.position = CGPoint(x: GlobalVar.player.position.x + GlobalVar.player.size.width * 0.25, y: GlobalVar.player.position.y)
+            obj2.zPosition = 1
+            obj2.physicsBody = SKPhysicsBody(rectangleOf: obj2.size)
+            obj2.physicsBody!.affectedByGravity = false
+            obj2.physicsBody!.categoryBitMask = PhysicsCategories.Obj
+            obj2.physicsBody!.collisionBitMask = PhysicsCategories.None
+            obj2.physicsBody!.contactTestBitMask = PhysicsCategories.Meteor
+            self.addChild(obj2)
+            
+            let moveObj2 = SKAction.moveTo(y: obj2.size.height + self.size.height, duration: 1)
+            let deleteObj2 = SKAction.removeFromParent()
+            let objSequence2 = SKAction.sequence([capSound, moveObj2, deleteObj2])
+            
+            obj2.run(objSequence2)
+            obj1.run(objSequence)
+        }
     }
     
     func spawnMeteor(){
@@ -293,9 +390,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let startPoint = CGPoint(x: randomXStart, y: self.size.height*1.2)
         let endPoint = CGPoint(x: randomXEnd, y: -self.size.height*0.2)
         
-        let meteor = SKSpriteNode(imageNamed: "rock")
+        let meteor = SKSpriteNode(imageNamed: "meteor")
         meteor.name = "Meteor"
-        meteor.setScale(0.2)
+        meteor.setScale(0.4)
         meteor.position = startPoint
         meteor.zPosition = 2
         meteor.physicsBody = SKPhysicsBody(rectangleOf: meteor.size)
@@ -304,7 +401,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         meteor.physicsBody!.collisionBitMask = PhysicsCategories.None
         meteor.physicsBody!.contactTestBitMask = PhysicsCategories.Player | PhysicsCategories.Obj
         self.addChild(meteor)
-        let moveMeteor = SKAction.move(to: endPoint, duration: 2)
+        let moveMeteor = SKAction.move(to: endPoint, duration: 3)
         let deleteMeteor = SKAction.removeFromParent()
         let loseLifeAction = SKAction.run(loseLife)
         let meteorSequence = SKAction.sequence([moveMeteor, deleteMeteor, loseLifeAction])
@@ -320,21 +417,109 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
     }
     
+    
+    func spawnX2(){
+        let randomXStart = random(min: gameArea.minX , max: gameArea.maxX)
+        let randomXEnd = random(min: gameArea.minX , max: gameArea.maxX)
+        
+        let startPoint = CGPoint(x: randomXStart, y: self.size.height*1.2)
+        let endPoint = CGPoint(x: randomXEnd, y: -self.size.height*0.2)
+        
+        let x2 = SKSpriteNode(imageNamed: "x2")
+        x2.name = "x2"
+        x2.setScale(0.4)
+        x2.position = startPoint
+        x2.zPosition = 2
+        x2.physicsBody = SKPhysicsBody(rectangleOf: x2.size)
+        x2.physicsBody!.affectedByGravity = false
+        x2.physicsBody!.categoryBitMask = PhysicsCategories.x2
+        x2.physicsBody!.collisionBitMask = PhysicsCategories.None
+        x2.physicsBody!.contactTestBitMask = PhysicsCategories.Player | PhysicsCategories.Obj
+        self.addChild(x2)
+        let moveMeteor = SKAction.move(to: endPoint, duration: 3)
+        let deleteMeteor = SKAction.removeFromParent()
+        let loseLifeAction = SKAction.run(loseLife)
+        let meteorSequence = SKAction.sequence([moveMeteor, deleteMeteor, loseLifeAction])
+        if currentGameState == gameState.inGame{
+           x2.run(meteorSequence)
+        }
+        
+        let dx = endPoint.x-startPoint.x
+        let dy = endPoint.y-startPoint.y
+        let amtRotate = atan2(dy,dx)
+        x2.zRotation = amtRotate
+        
+        
+    }
+    
+    
+    
+    func spawnNuke(){
+        let randomXStart = random(min: gameArea.minX , max: gameArea.maxX)
+        let randomXEnd = random(min: gameArea.minX , max: gameArea.maxX)
+        
+        let startPoint = CGPoint(x: randomXStart, y: self.size.height*1.2)
+        let endPoint = CGPoint(x: randomXEnd, y: -self.size.height*0.2)
+        
+        let nuke = SKSpriteNode(imageNamed: "nuke")
+        nuke.name = "Nuke"
+        nuke.zRotation = 1
+        nuke.setScale(0.2)
+        nuke.position = startPoint
+        nuke.zPosition = 2
+        nuke.physicsBody = SKPhysicsBody(rectangleOf: nuke.size)
+        nuke.physicsBody!.affectedByGravity = false
+        nuke.physicsBody!.categoryBitMask = PhysicsCategories.Nuke
+        nuke.physicsBody!.collisionBitMask = PhysicsCategories.None
+        nuke.physicsBody!.contactTestBitMask = PhysicsCategories.Player | PhysicsCategories.Obj | PhysicsCategories.Meteor
+        self.addChild(nuke)
+        let moveMeteor = SKAction.move(to: endPoint, duration: 3)
+        let deleteMeteor = SKAction.removeFromParent()
+        let loseLifeAction = SKAction.run(loseLife)
+        let meteorSequence = SKAction.sequence([moveMeteor, deleteMeteor, loseLifeAction])
+        if currentGameState == gameState.inGame{
+        nuke.run(meteorSequence)
+        }
+        
+        let dx = endPoint.x-startPoint.x
+        let dy = endPoint.y-startPoint.y
+        let amtRotate = atan2(dy,dx)
+        nuke.zRotation = amtRotate
+
+    }
+  
+    
     var levelNumber = 0
     func startNewLevel(){
         
         levelNumber += 1
+        levelLabel.text = "Level \(levelNumber)"
+        let spawnNuke = SKAction.run(spawnNuke)
+        let spawnX2 = SKAction.run(spawnX2)
+        
+        if levelNumber == 2 || levelNumber == 5 || levelNumber == 7{
+            self.run(spawnNuke)
+        }
+        if levelNumber == 3 || levelNumber == 6 {
+            self.run(spawnX2)
+        }
+        if levelNumber == 4 {
+            currentAbilityState = abilityState.normal
+        }
         if self.action(forKey: "spawningMeteor") != nil{
             self.removeAction(forKey: "spawningMeteor")
         }
         
         var levelDuration = TimeInterval()
         switch levelNumber{
-        case 1: levelDuration = 1.2
-        case 2: levelDuration = 1
-        case 3: levelDuration = 0.8
-        case 4: levelDuration = 0.6
+        case 1: levelDuration = 0.8
+        case 2: levelDuration = 0.008
+        case 3: levelDuration = 0.5
+        case 4: levelDuration = 0.4
         case 5: levelDuration = 0.01
+        case 6: levelDuration = 0.6
+        case 7: levelDuration = 0.01
+        case 8: levelDuration = 0.2
             
         default:
             levelDuration = 0.5
@@ -352,6 +537,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         
     }
+
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
@@ -368,14 +554,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             let previousPoT = touch.previousLocation(in: self)
             let amtDragged = pointOfTouch.x - previousPoT.x
             if currentGameState == gameState.inGame{
-            player.position.x += amtDragged
+                GlobalVar.player.position.x += amtDragged
             }
             
-            if player.position.x > gameArea.maxX - player.size.width/2{
-                player.position.x = gameArea.maxX - player.size.width/2
+            if GlobalVar.player.position.x > gameArea.maxX - GlobalVar.player.size.width/2{
+                GlobalVar.player.position.x = gameArea.maxX - GlobalVar.player.size.width/2
             }
-            if player.position.x < gameArea.minX + player.size.width/2{
-                player.position.x = gameArea.minX + player.size.width/2
+            if GlobalVar.player.position.x < gameArea.minX + GlobalVar.player.size.width/2{
+                GlobalVar.player.position.x = gameArea.minX + GlobalVar.player.size.width/2
             }
         }
     }

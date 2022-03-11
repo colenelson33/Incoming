@@ -24,6 +24,7 @@
 		5E885B1A27C5B04100032C23 /* spaceMusic.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 5E885B1927C5B04100032C23 /* spaceMusic.mp3 */; };
 		5E885B1C27C5B04600032C23 /* boomSound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 5E885B1B27C5B04600032C23 /* boomSound.mp3 */; };
 		5EAEE23D27C81FE600FEE2EC /* next.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 5EAEE23C27C81FE600FEE2EC /* next.mp3 */; };
+		5ED4E37127DBE5EA007876E9 /* GlobalVar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ED4E37027DBE5EA007876E9 /* GlobalVar.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +47,7 @@
 		5E885B1927C5B04100032C23 /* spaceMusic.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = spaceMusic.mp3; sourceTree = "<group>"; };
 		5E885B1B27C5B04600032C23 /* boomSound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = boomSound.mp3; sourceTree = "<group>"; };
 		5EAEE23C27C81FE600FEE2EC /* next.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = next.mp3; sourceTree = "<group>"; };
+		5ED4E37027DBE5EA007876E9 /* GlobalVar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalVar.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,6 +90,7 @@
 				5E885ACD27BD930C00032C23 /* AppDelegate.swift */,
 				5E885ACF27BD930C00032C23 /* GameScene.sks */,
 				5E885AD127BD930C00032C23 /* Actions.sks */,
+				5ED4E37027DBE5EA007876E9 /* GlobalVar.swift */,
 				5E885AD327BD930C00032C23 /* GameScene.swift */,
 				5E885AF527C1DA5300032C23 /* PlayerSelectScene.swift */,
 				5E885AEF27C186CB00032C23 /* MainMenuScene.swift */,
@@ -183,6 +186,7 @@
 				5E885AD427BD930C00032C23 /* GameScene.swift in Sources */,
 				5E885AD627BD930C00032C23 /* GameViewController.swift in Sources */,
 				5E885AF627C1DA5300032C23 /* PlayerSelectScene.swift in Sources */,
+				5ED4E37127DBE5EA007876E9 /* GlobalVar.swift in Sources */,
 				5E885AEE27C0A7A100032C23 /* GameOverScene.swift in Sources */,
 				5E885ACE27BD930C00032C23 /* AppDelegate.swift in Sources */,
 			);
