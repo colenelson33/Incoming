@@ -4,9 +4,8 @@
 
 Basic asteriods game at this point. Each level in manual coded to change after a certain score. Asteriods spawn at constant rate, and the screen will only ever have one asteroid at a time. Single selectable player at the moment, and only one type of weapon. 
 
- <img src="https://user-images.githubusercontent.com/98774834/162096414-56f9e1ff-ab1a-4ce0-9834-81f3d13708a2.PNG" width="100" height="100">
-![IMG_6502](https://user-images.githubusercontent.com/98774834/162096414-56f9e1ff-ab1a-4ce0-9834-81f3d13708a2.PNG)
-![IMG_6503](https://user-images.githubusercontent.com/98774834/162096421-3abc8162-268d-4694-a898-090f14c15d55.PNG)
+ <img src="https://user-images.githubusercontent.com/98774834/162096414-56f9e1ff-ab1a-4ce0-9834-81f3d13708a2.PNG" width="100" height="400">
+ <img src="https://user-images.githubusercontent.com/98774834/162096421-3abc8162-268d-4694-a898-090f14c15d55.PNG" width="100" height="400">
 
 # Version 1.1
 
